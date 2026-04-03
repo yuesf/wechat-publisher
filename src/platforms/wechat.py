@@ -184,18 +184,18 @@ class WeChatPlatform(Platform):
 
             from PIL import Image, ImageDraw, ImageFont
 
-            # 创建一个简单的渐变封面
+            # 创建一个简单的渐变封面（绿色主题）
             width, height = 900, 500
-            img = Image.new("RGB", (width, height), color="#4A90D9")
+            img = Image.new("RGB", (width, height), color="#4CAF50")
 
             # 添加一些装饰
             draw = ImageDraw.Draw(img)
 
-            # 绘制渐变效果
+            # 绘制渐变效果（绿色渐变）
             for i in range(height):
-                r = int(74 + (i / height) * 30)
-                g = int(144 - (i / height) * 50)
-                b = int(217 - (i / height) * 30)
+                r = int(76 - (i / height) * 30)
+                g = int(175 - (i / height) * 50)
+                b = int(80 - (i / height) * 30)
                 draw.line([(0, i), (width, i)], fill=(r, g, b))
 
             # 保存到内存
