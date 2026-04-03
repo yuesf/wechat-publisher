@@ -39,6 +39,15 @@ class WeChatConfig(BaseModel):
     app_secret: str = ""
 
 
+class AIConfig(BaseModel):
+    """AI 配置"""
+
+    provider: str = "openai"
+    api_key: str = ""
+    base_url: str = ""
+    model: str = ""
+
+
 class Settings(BaseSettings):
     """应用配置"""
 
@@ -47,6 +56,9 @@ class Settings(BaseSettings):
 
     # 平台配置
     wechat: WeChatConfig = WeChatConfig()
+
+    # AI 配置
+    ai: AIConfig = AIConfig()
 
     class Config:
         env_prefix = "WECHAT_PUBLISHER_"
@@ -70,6 +82,8 @@ class Settings(BaseSettings):
                 data = yaml.safe_load(f) or {}
                 if "wechat" in data:
                     self.wechat = WeChatConfig(**data["wechat"])
+                if "ai" in data:
+                    self.ai = AIConfig(**data["ai"])
 
         # 环境变量优先级更高（先检查 openclaw 环境变量，再检查系统环境变量）
         # 微信公众号配置
@@ -81,6 +95,23 @@ class Settings(BaseSettings):
         if wechat_app_secret is not None:
             self.wechat.app_secret = wechat_app_secret
 
+        # AI 配置
+        ai_provider = openclaw_env.get("AI_PROVIDER") or os.environ.get("AI_PROVIDER")
+        if ai_provider is not None:
+            self.ai.provider = ai_provider
+
+        ai_api_key = openclaw_env.get("AI_API_KEY") or os.environ.get("AI_API_KEY")
+        if ai_api_key is not None:
+            self.ai.api_key = ai_api_key
+
+        ai_base_url = openclaw_env.get("AI_BASE_URL") or os.environ.get("AI_BASE_URL")
+        if ai_base_url is not None:
+            self.ai.base_url = ai_base_url
+
+        ai_model = openclaw_env.get("AI_MODEL") or os.environ.get("AI_MODEL")
+        if ai_model is not None:
+            self.ai.model = ai_model
+
     def save(self) -> None:
         """保存配置到文件"""
         self.config_dir.mkdir(parents=True, exist_ok=True)
@@ -88,6 +119,7 @@ class Settings(BaseSettings):
 
         data = {
             "wechat": self.wechat.model_dump(),
+            "ai": self.ai.model_dump(),
         }
 
         with open(config_file, "w", encoding="utf-8") as f:
@@ -95,6 +127,9 @@ class Settings(BaseSettings):
 
     def is_wechat_configured(self) -> bool:
         return bool(self.wechat.app_id and self.wechat.app_secret)
+
+    def is_ai_configured(self) -> bool:
+        return bool(self.ai.api_key)
 
 
 # 全局配置实例

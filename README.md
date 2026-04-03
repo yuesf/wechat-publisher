@@ -1,53 +1,96 @@
-# WeChat Publisher
+# wechat-publisher
 
-微信公众号文章发布工具
+把文章发到微信公众号草稿箱，发布前自动 AI 去痕，让内容读起来更像真人写的。
 
-## 安装
+## 装上
 
 ```bash
-pip install -e .
+pip install wechat-publisher
 ```
 
-## 配置
+## 配一下
 
 ```bash
-# 初始化配置
-wechat-publisher config init
+# 初始化
+openclaw config init
 
-# 设置 AppID 和 AppSecret
-wechat-publisher config set wechat.app_id your_app_id
-wechat-publisher config set wechat.app_secret your_app_secret
+# 微信公众号的凭证
+openclaw config set wechat.app_id <你的AppID>
+openclaw config set wechat.app_secret <你的AppSecret>
 
-# 查看当前配置
-wechat-publisher config show
+# AI 去痕用的 API（可选，但建议配）
+openclaw config set ai.api_key <你的API Key>
+openclaw config set ai.provider qwen  # 或者 openai、zhipu 等
 ```
 
-## 使用
+## 用一下
 
 ```bash
-# 发布 HTML 文件到微信公众号草稿箱
+# 把 HTML 文章发到公众号草稿箱，自动 AI 去痕
 wechat-publisher publish article.html
 
-# 指定标题
-wechat-publisher publish article.html --title "文章标题"
+# 不用 AI 去痕
+wechat-publisher publish article.html --no-humanize
 
-# 指定封面图片
-wechat-publisher publish article.html --cover cover.jpg
+# 指定标题和封面
+wechat-publisher publish article.html --title "文章标题" --cover cover.jpg
 
-# 测试连接
+# 调过去痕强度
+wechat-publisher publish article.html --intensity light   # 轻度
+wechat-publisher publish article.html --intensity heavy  # 重度
+
+# 看看配置对不对
+wechat-publisher config show
+
+# 测试微信连接
 wechat-publisher test
-
-# 上传图片
-wechat-publisher upload-image image.jpg
 ```
 
 ## 环境变量
 
-也可以通过环境变量配置：
+不想用 config 命令？直接环境变量：
 
-- `WECHAT_PUBLISHER_WECHAT_APP_ID`
-- `WECHAT_PUBLISHER_WECHAT_APP_SECRET`
+```bash
+export WECHAT_PUBLISHER_WECHAT_APP_ID=xxx
+export WECHAT_PUBLISHER_WECHAT_APP_SECRET=xxx
+export WECHAT_PUBLISHER_AI_API_KEY=xxx
+export WECHAT_PUBLISHER_AI_PROVIDER=qwen
+```
+
+## Claude Code 里用
+
+在 Claude Code 里直接说人话：
+
+- "把这篇 article.html 发到公众号"
+- "帮我发布到微信，用重度去痕"
+- "测试一下微信连接"
+
+## 支持的 AI Provider
+
+| Provider | 说明 |
+|----------|------|
+| openai | OpenAI GPT 系列 |
+| qwen | 通义千问（默认） |
+| zhipu | 智谱 GLM |
+| doubao | 豆包 |
+| minimax | MiniMax |
+| moonshot | Moonshot |
+| hunyuan | 腾讯混元 |
+| yi | 零一万物 |
+
+## 开发
+
+```bash
+git clone https://github.com/yuesf/wechat-publisher.git
+cd wechat-publisher
+pip install -e .
+wechat-publisher --help
+```
 
 ## 从 article-publisher 剥离
 
-本项目从 multi-writing-skills 项目中剥离，专门用于微信公众号发布功能。
+这个项目从 [article-publisher](https://github.com/yuesf/article-publisher) 里剥离出来的，专门用来发公众号。
+
+## License
+
+MIT

@@ -14,6 +14,7 @@ from rich.table import Table
 import typer
 
 from .config import settings
+from .humanizer import Humanizer
 from .platforms import WeChatPlatform, PublishRequest
 
 app = typer.Typer(
@@ -32,6 +33,54 @@ def create_wechat_platform() -> WeChatPlatform:
         app_id=settings.wechat.app_id,
         app_secret=settings.wechat.app_secret,
     )
+
+
+async def humanize_html_content(content: str, intensity: str = "medium") -> tuple[str, bool]:
+    """
+    对 HTML 内容进行去痕处理
+
+    Returns:
+        tuple[处理后的内容, 是否进行了去痕处理]
+    """
+    settings.load()
+    if not settings.is_ai_configured():
+        return content, False
+
+    # 简单处理：从 HTML 中提取纯文本进行处理
+    # 移除 HTML 标签获取纯文本
+    text_content = re.sub(r'<[^>]+>', '\n', content)
+    text_content = re.sub(r'\n+', '\n', text_content).strip()
+
+    if not text_content:
+        return content, False
+
+    console.print(f"[cyan]正在使用 AI 去痕处理...[/cyan]")
+
+    humanizer = Humanizer(
+        api_key=settings.ai.api_key,
+        provider=settings.ai.provider,
+        base_url=settings.ai.base_url,
+        model=settings.ai.model,
+    )
+
+    try:
+        result = await humanizer.humanize(text_content, intensity=intensity)
+
+        if result.changes:
+            console.print(f"[yellow]去痕变化:[/yellow]")
+            for change in result.changes[:3]:
+                console.print(f"  - {change}")
+
+        # 将去痕后的文本重新包装成简单 HTML
+        humanized_html = f"<p>来源: AI整理</p>\n" + result.humanized.replace("\n\n", "</p><p>").replace("\n", "<br>")
+        humanized_html = f"<div>{humanized_html}</div>"
+
+        return humanized_html, True
+    except Exception as e:
+        console.print(f"[yellow]AI 去痕失败: {e}，使用原文发布[/yellow]")
+        return content, False
+    finally:
+        await humanizer.close()
 
 
 # 配置命令组
@@ -58,6 +107,8 @@ def config_show() -> None:
     table.add_row("配置文件", str(settings.get_config_file()))
     table.add_row("微信 AppID", settings.wechat.app_id or "[red]未配置[/red]")
     table.add_row("微信 Secret", "***" if settings.wechat.app_secret else "[red]未配置[/red]")
+    table.add_row("AI Provider", settings.ai.provider or "[red]未配置[/red]")
+    table.add_row("AI Model", settings.ai.model or "[red]未配置[/red]")
 
     console.print(table)
 
@@ -71,7 +122,8 @@ def config_set(
 
     示例:
         wechat-publisher config set wechat.app_id your_app_id
-        wechat-publisher config set wechat.app_secret your_secret
+        wechat-publisher config set wechat.app_secret your_app_secret
+        wechat-publisher config set ai.api_key your_api_key
     """
     settings.load()
 
@@ -90,6 +142,18 @@ def config_set(
         else:
             console.print(f"[red]未知配置项: {key}[/red]")
             raise typer.Exit(1)
+    elif section == "ai":
+        if subkey == "provider":
+            settings.ai.provider = value
+        elif subkey == "api_key":
+            settings.ai.api_key = value
+        elif subkey == "base_url":
+            settings.ai.base_url = value
+        elif subkey == "model":
+            settings.ai.model = value
+        else:
+            console.print(f"[red]未知配置项: {key}[/red]")
+            raise typer.Exit(1)
     else:
         console.print(f"[red]未知配置节: {section}[/red]")
         raise typer.Exit(1)
@@ -105,10 +169,12 @@ def publish(
     title: Optional[str] = typer.Option(None, "--title", "-t", help="文章标题（默认从文件名提取）"),
     cover: Optional[str] = typer.Option(None, "--cover", "-c", help="封面图片路径"),
     author: Optional[str] = typer.Option(None, "--author", "-a", help="作者"),
+    humanize: bool = typer.Option(True, "--humanize/--no-humanize", help="发布前自动 AI 去痕（默认启用）"),
+    intensity: str = typer.Option("medium", "--intensity", "-i", help="去痕强度 (light/medium/heavy)"),
 ) -> None:
     """发布 HTML 文件到微信公众号草稿箱
 
-    直接发布 HTML 文件，不进行任何转换。适用于已准备好的 HTML 内容。
+    发布前会自动使用 AI 去痕处理，让文章读起来更自然。
     """
     if not file.exists():
         console.print(f"[red]文件不存在: {file}[/red]")
@@ -131,6 +197,14 @@ def publish(
 
     console.print(f"[cyan]发布 HTML 文件: {file}[/cyan]")
     console.print(f"[cyan]标题: {article_title}[/cyan]")
+
+    # AI 去痕处理
+    if humanize:
+        html_content, was_humanized = asyncio.run(humanize_html_content(html_content, intensity))
+        if was_humanized:
+            console.print(f"[green]AI 去痕完成[/green]")
+        else:
+            console.print(f"[yellow]跳过 AI 去痕（未配置 AI）[/yellow]")
 
     # 发布到平台
     try:
