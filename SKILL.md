@@ -83,11 +83,14 @@ wechat-publisher publish-md article.md --intensity heavy
 ### 直接使用 wenyan-cli 转换
 
 ```bash
-# 转换 Markdown 为 HTML
-wenyan render -f article.md -o output.html
+# 转换 Markdown 为 HTML（输出到 stdout）
+wenyan render -f article.md
 
 # 使用特定主题
-wenyan render -f article.md -o output.html -T lapis
+wenyan render -f article.md -t lapis
+
+# 指定代码高亮主题
+wenyan render -f article.md -t lapis -h monokai
 
 # 查看可用主题
 wenyan theme list

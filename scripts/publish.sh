@@ -209,15 +209,16 @@ main() {
     log_info "${BLUE}Step 1:${NC} 使用 wenyan-cli 转换 Markdown → HTML"
     log_info "主题: $THEME, 代码高亮: $HIGHLIGHT"
     
+    # wenyan render 输出到 stdout，需要重定向到文件
     wenyan render \
         -f "$markdown_file" \
-        -o "$output_html" \
-        -T "$THEME" \
+        -t "$THEME" \
         --highlight "$HIGHLIGHT" \
-        2>&1
+        > "$output_html" 2>&1
         
-    if [[ ! -f "$output_html" ]]; then
+    if [[ ! -f "$output_html" ]] || [[ ! -s "$output_html" ]]; then
         log_error "wenyan 转换失败，未生成输出文件"
+        cat "$output_html" 2>/dev/null || true
         exit 1
     fi
     
