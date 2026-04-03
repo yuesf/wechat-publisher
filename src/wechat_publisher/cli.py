@@ -14,6 +14,7 @@ from rich.table import Table
 import typer
 
 from .config import settings
+from .converter import WeChatStyleConverter
 from .humanizer import Humanizer
 from .platforms import WeChatPlatform, PublishRequest
 
@@ -160,6 +161,83 @@ def config_set(
 
     settings.save()
     console.print(f"[green]已设置 {key}[/green]")
+
+
+# 转换命令
+@app.command()
+def convert(
+    file: Path = typer.Argument(..., help="Markdown 文件路径", exists=True),
+    output: Optional[Path] = typer.Option(None, "--output", "-o", help="输出 HTML 文件路径"),
+    theme: str = typer.Option("default", "--theme", help="主题名称 (default/orange/blue/green/purple/simple)"),
+    title: Optional[str] = typer.Option(None, "--title", "-t", help="文章标题（默认从文件名提取）"),
+) -> None:
+    """将 Markdown 转换为微信公众号格式的 HTML
+
+    支持多种精美主题，自动处理代码高亮、列表、表格等元素。
+    """
+    if not file.exists():
+        console.print(f"[red]文件不存在: {file}[/red]")
+        raise typer.Exit(1)
+
+    # 读取 Markdown 内容
+    markdown_content = file.read_text(encoding="utf-8")
+
+    # 解析 frontmatter 并移除
+    article_title = title
+    frontmatter_cover = None
+    
+    fm_match = re.match(r'^---\n(.*?)\n---\n', markdown_content, re.DOTALL)
+    if fm_match:
+        fm_content = fm_match.group(1)
+        # 移除 frontmatter
+        markdown_content = markdown_content[fm_match.end():]
+        
+        # 提取标题
+        if not article_title:
+            title_match = re.search(r'^title:\s*(.+?)\s*$', fm_content, re.MULTILINE)
+            if title_match:
+                article_title = title_match.group(1).strip().strip('"\'')
+        
+        # 提取封面
+        cover_match = re.search(r'^cover:\s*(.+?)\s*$', fm_content, re.MULTILINE)
+        if cover_match:
+            frontmatter_cover = cover_match.group(1).strip().strip('"\'')
+        
+        # 如果 frontmatter 有 title，移除正文中的第一个 H1（避免重复）
+        if article_title:
+            markdown_content = re.sub(r'^#\s+.+$', '', markdown_content, count=1, flags=re.MULTILINE)
+            markdown_content = markdown_content.lstrip('\n')
+    else:
+        # 没有 frontmatter，尝试从第一个 # 标题提取
+        if not article_title:
+            h1_match = re.search(r'^#\s+(.+)$', markdown_content, re.MULTILINE)
+            if h1_match:
+                article_title = h1_match.group(1).strip()
+
+    console.print(f"[cyan]转换 Markdown → HTML[/cyan]")
+    console.print(f"[cyan]输入文件: {file}[/cyan]")
+    if article_title:
+        console.print(f"[cyan]标题: {article_title}[/cyan]")
+    if frontmatter_cover:
+        console.print(f"[cyan]封面: {frontmatter_cover}[/cyan]")
+    console.print(f"[cyan]主题: {theme}[/cyan]")
+
+    # 转换
+    try:
+        converter = WeChatStyleConverter(theme=theme)
+        html_content = converter.convert(markdown_content, title=article_title)
+    except Exception as e:
+        console.print(f"[red]转换失败: {e}[/red]")
+        raise typer.Exit(1)
+
+    # 确定输出文件
+    if output:
+        output_path = output
+    else:
+        output_path = file.with_suffix('.html')
+
+    output_path.write_text(html_content, encoding="utf-8")
+    console.print(f"[green]转换完成: {output_path}[/green]")
 
 
 # 发布命令
