@@ -87,9 +87,9 @@ pip install -e .
 wechat-publisher --help
 ```
 
-## 从 article-publisher 剥离
+## 从 multi-writing-skills 剥离
 
-这个项目从 [article-publisher](https://github.com/yuesf/article-publisher) 里剥离出来的，专门用来发公众号。
+这个项目从 [multi-writing-skills](https://github.com/yuesf/multi-writing-skills) 里剥离出来的，专门用来发公众号。
 
 ## License
 
