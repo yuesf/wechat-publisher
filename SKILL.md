@@ -6,7 +6,7 @@
 
 - **纯 Python 实现**: 不依赖 wenyan-cli 或其他外部工具
 - **Markdown 转换**: 内置 Markdown → HTML 转换，参考 wenyan-cli 排版风格
-- **多主题支持**: 多种精美主题（default、blue、green、purple、orange、simple）
+- **多主题支持**: 多种精美主题（green、blue、purple、orange、default、simple）
 - **代码高亮**: Mac 风格代码块，语法高亮
 - **AI 去痕**: 发布前自动 AI 去痕处理，让内容读起来更像真人写的
 - **封面生成**: 自动处理封面图，支持本地/网络图片
@@ -25,11 +25,6 @@
 ```bash
 # 从 GitHub 安装
 pip install git+https://github.com/yuesf/wechat-publisher.git
-
-# 或者开发模式
-git clone https://github.com/yuesf/wechat-publisher.git
-cd wechat-publisher
-pip install -e .
 ```
 
 ## 配置
@@ -41,7 +36,7 @@ pip install -e .
 
 ### 第二步：配置凭证
 
-#### 方式 1: 环境变量
+#### 环境变量
 
 ```bash
 export WECHAT_APP_ID=your_wechat_app_id
@@ -52,7 +47,7 @@ export AI_API_KEY=your_api_key
 export AI_PROVIDER=qwen  # openai, qwen, zhipu, doubao, minimax, moonshot, hunyuan, yi
 ```
 
-#### 方式 2: 配置文件
+#### 配置文件
 
 ```bash
 # 初始化配置
@@ -65,28 +60,38 @@ wechat-publisher config set ai.api_key <API Key>
 wechat-publisher config set ai.provider qwen
 ```
 
-### 第三步：IP 白名单
+### 第三步：设置 IP 白名单
 
-确保运行机器的 IP 已添加到微信公众号后台白名单：
-- 登录 https://mp.weixin.qq.com/
-- 设置与开发 → 基本配置 → IP白名单
+把运行机器的 IP 添加到微信公众号后台白名单：
+1. 登录 https://mp.weixin.qq.com/
+2. 设置与开发 → 基本配置 → IP白名单
 
 ## 使用方式
 
-### Markdown 转换
+### 通过 OpenClaw 直接发送
+
+在 OpenClaw 对话中直接说：
+- "把这篇文章发到公众号"
+- "用蓝色主题发布"
+- "帮我发布到微信，测试一下"
+- "使用 AI 去痕发布"
+
+### 命令行方式
+
+#### Markdown 转换
 
 ```bash
-# 基本转换
+# 基本转换（默认绿色主题）
 wechat-publisher convert article.md
 
-# 指定主题
+# 指定蓝色主题
 wechat-publisher convert article.md --theme blue
 
 # 指定输出文件
 wechat-publisher convert article.md -o output.html
 ```
 
-### 发布到微信
+#### 发布到微信
 
 ```bash
 # 发布 HTML 文件到草稿箱
@@ -102,7 +107,7 @@ wechat-publisher publish article.html --no-humanize
 wechat-publisher publish article.html --intensity heavy
 ```
 
-### 一站式：Markdown → 转换 → 发布
+#### 一站式：Markdown → 转换 → 发布
 
 ```bash
 # 转换后直接发布
@@ -110,13 +115,13 @@ wechat-publisher convert article.md --theme blue -o /tmp/article.html
 wechat-publisher publish /tmp/article.html --title "文章标题"
 ```
 
-### 测试连接
+#### 测试连接
 
 ```bash
 wechat-publisher test
 ```
 
-### 上传图片
+#### 上传图片
 
 ```bash
 wechat-publisher upload-image image.jpg
@@ -137,15 +142,15 @@ cover: ./assets/cover.jpg
 你的内容...
 ```
 
-### 可用主题
+## 可用主题
 
 | 主题 | 风格 |
 |------|------|
-| default | 简洁清爽 |
+| green | 清新自然（绿色，默认） |
 | blue | 清新专业（蓝色） |
-| green | 清新自然（绿色） |
 | purple | 优雅神秘（紫色） |
 | orange | 温暖活力（橙色） |
+| default | 简洁清爽 |
 | simple | 极简风格 |
 
 ## AI 去痕
