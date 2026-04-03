@@ -1,0 +1,101 @@
+"""
+配置管理
+"""
+
+import os
+from pathlib import Path
+from typing import Optional
+
+import yaml
+from pydantic import BaseModel
+from pydantic_settings import BaseSettings
+
+
+def is_openclaw_env() -> bool:
+    """检测是否在 openclaw 环境中运行"""
+    openclaw_dir = Path.home() / ".openclaw"
+    return openclaw_dir.exists() and openclaw_dir.is_dir()
+
+
+def load_openclaw_env() -> dict[str, str]:
+    """从 ~/.openclaw/.env 加载环境变量"""
+    env_file = Path.home() / ".openclaw" / ".env"
+    env_vars = {}
+    if env_file.exists():
+        with open(env_file, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    if "=" in line:
+                        key, value = line.split("=", 1)
+                        env_vars[key.strip()] = value.strip()
+    return env_vars
+
+
+class WeChatConfig(BaseModel):
+    """微信公众号配置"""
+
+    app_id: str = ""
+    app_secret: str = ""
+
+
+class Settings(BaseSettings):
+    """应用配置"""
+
+    # 配置文件路径
+    config_dir: Path = Path.home() / ".wechat-publisher"
+
+    # 平台配置
+    wechat: WeChatConfig = WeChatConfig()
+
+    class Config:
+        env_prefix = "WECHAT_PUBLISHER_"
+        env_nested_delimiter = "_"
+
+    def get_config_file(self) -> Path:
+        """获取配置文件路径"""
+        return self.config_dir / "config.yaml"
+
+    def load(self) -> None:
+        """从文件和环境变量加载配置"""
+        # 如果在 openclaw 环境中，先加载 ~/.openclaw/.env
+        openclaw_env = {}
+        if is_openclaw_env():
+            openclaw_env = load_openclaw_env()
+
+        # 先从配置文件加载
+        config_file = self.get_config_file()
+        if config_file.exists():
+            with open(config_file, encoding="utf-8") as f:
+                data = yaml.safe_load(f) or {}
+                if "wechat" in data:
+                    self.wechat = WeChatConfig(**data["wechat"])
+
+        # 环境变量优先级更高（先检查 openclaw 环境变量，再检查系统环境变量）
+        # 微信公众号配置
+        wechat_app_id = openclaw_env.get("WECHAT_APP_ID") or os.environ.get("WECHAT_APP_ID")
+        if wechat_app_id is not None:
+            self.wechat.app_id = wechat_app_id
+
+        wechat_app_secret = openclaw_env.get("WECHAT_APP_SECRET") or os.environ.get("WECHAT_APP_SECRET")
+        if wechat_app_secret is not None:
+            self.wechat.app_secret = wechat_app_secret
+
+    def save(self) -> None:
+        """保存配置到文件"""
+        self.config_dir.mkdir(parents=True, exist_ok=True)
+        config_file = self.get_config_file()
+
+        data = {
+            "wechat": self.wechat.model_dump(),
+        }
+
+        with open(config_file, "w", encoding="utf-8") as f:
+            yaml.dump(data, f, allow_unicode=True, default_flow_style=False)
+
+    def is_wechat_configured(self) -> bool:
+        return bool(self.wechat.app_id and self.wechat.app_secret)
+
+
+# 全局配置实例
+settings = Settings()
