@@ -168,13 +168,17 @@ def config_set(
 def convert(
     file: Path = typer.Argument(..., help="Markdown 文件路径", exists=True),
     output: Optional[Path] = typer.Option(None, "--output", "-o", help="输出 HTML 文件路径"),
-    theme: str = typer.Option("default", "--theme", help="主题名称 (default/orange/blue/green/purple/simple)"),
+    theme: str = typer.Option(None, "--theme", help="主题名称 (green/blue/purple/orange/simple/default)"),
     title: Optional[str] = typer.Option(None, "--title", "-t", help="文章标题（默认从文件名提取）"),
 ) -> None:
     """将 Markdown 转换为微信公众号格式的 HTML
 
     支持多种精美主题，自动处理代码高亮、列表、表格等元素。
     """
+    # 默认使用绿色主题
+    if theme is None:
+        theme = "green"
+    
     if not file.exists():
         console.print(f"[red]文件不存在: {file}[/red]")
         raise typer.Exit(1)
