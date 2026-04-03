@@ -1,12 +1,13 @@
 # wechat-publisher Skill
 
-微信公众号文章发布 skill，基于 wenyan-cli + wechat-publisher。
+微信公众号文章发布工具，完全独立实现，不依赖任何外部 CLI 工具。
 
 ## 功能特性
 
-- **Markdown 转换**: 使用 wenyan-cli 将 Markdown 转换为精美的微信适配 HTML
-- **多主题支持**: lapis、phycat、default、orange、purple 等精美主题
-- **代码高亮**: 9 种代码高亮主题，Mac 风格代码块
+- **纯 Python 实现**: 不依赖 wenyan-cli 或其他外部工具
+- **Markdown 转换**: 内置 Markdown → HTML 转换（参考 wenyan 风格）
+- **多主题支持**: 多种精美主题（lapis、phycat、default 等）
+- **代码高亮**: 9 种代码高亮主题
 - **图片自动处理**: 本地/网络图片自动上传到微信图床
 - **AI 去痕**: 发布前自动 AI 去痕处理，让内容读起来更像真人写的
 - **封面生成**: 自动处理封面图，支持本地/网络图片
@@ -14,43 +15,47 @@
 ## 触发条件
 
 当用户需要以下操作时自动触发：
-- 将 Markdown 文章发布到微信公众号草稿箱
+- 将 Markdown 或 HTML 文章发布到微信公众号草稿箱
 - 转换 Markdown 为公众号格式 HTML
 - 使用特定主题发布公众号文章
 - 测试微信连接
 
-## 工作流程
-
-```
-Markdown (含 frontmatter) → wenyan-cli 转换 → styled HTML → wechat-publisher 上传 → 草稿箱
-```
-
-## 前置要求
-
-### 1. 安装依赖
+## 安装
 
 ```bash
-# 安装 wenyan-cli (Node.js)
-npm install -g @wenyan-md/cli
-
-# 安装 wechat-publisher (Python)
+# 安装依赖
 pip install wechat-publisher
+
+# 或者开发模式
+git clone https://github.com/yuesf/wechat-publisher.git
+cd wechat-publisher
+pip install -e .
 ```
 
-### 2. 配置微信公众号凭证
+## 配置
 
-在 `~/.openclaw/.env` 中添加：
+### 方式 1: 环境变量
 
 ```bash
-WECHAT_APP_ID=your_wechat_app_id
-WECHAT_APP_SECRET=your_wechat_app_secret
+export WECHAT_APP_ID=your_wechat_app_id
+export WECHAT_APP_SECRET=your_wechat_app_secret
+
+# AI 去痕（可选）
+export AI_API_KEY=your_api_key
+export AI_PROVIDER=qwen  # openai, qwen, zhipu, doubao, minimax, moonshot, hunyuan, yi
 ```
 
-或者通过命令行配置：
+### 方式 2: 配置文件
 
 ```bash
+# 初始化配置
+wechat-publisher config init
+
+# 设置配置
 wechat-publisher config set wechat.app_id <AppID>
 wechat-publisher config set wechat.app_secret <AppSecret>
+wechat-publisher config set ai.api_key <API Key>
+wechat-publisher config set ai.provider qwen
 ```
 
 ### 3. IP 白名单
@@ -64,36 +69,17 @@ wechat-publisher config set wechat.app_secret <AppSecret>
 ### 基本发布
 
 ```bash
-# 使用默认主题发布
-wechat-publisher publish-md article.md
+# 发布 HTML 文件到草稿箱
+wechat-publisher publish article.html
 
-# 指定主题
-wechat-publisher publish-md article.md --theme lapis
-
-# 指定代码高亮主题
-wechat-publisher publish-md article.md --highlight monokai
+# 指定标题和封面
+wechat-publisher publish article.html --title "文章标题" --cover cover.jpg
 
 # 不使用 AI 去痕
-wechat-publisher publish-md article.md --no-humanize
+wechat-publisher publish article.html --no-humanize
 
-# 调整 AI 去痕强度 (light/medium/heavy)
-wechat-publisher publish-md article.md --intensity heavy
-```
-
-### 直接使用 wenyan-cli 转换
-
-```bash
-# 转换 Markdown 为 HTML（输出到 stdout）
-wenyan render -f article.md
-
-# 使用特定主题
-wenyan render -f article.md -t lapis
-
-# 指定代码高亮主题
-wenyan render -f article.md -t lapis -h monokai
-
-# 查看可用主题
-wenyan theme list
+# 调整 AI 去痕强度
+wechat-publisher publish article.html --intensity heavy
 ```
 
 ### 测试连接
@@ -102,67 +88,37 @@ wenyan theme list
 wechat-publisher test
 ```
 
-## Markdown 格式要求
-
-文件顶部必须包含 frontmatter：
-
-```markdown
----
-title: 文章标题（必填！）
-cover: ./assets/cover.jpg # 封面图（必填！推荐 1080×864）
----
-
-# 正文开始
-
-你的内容...
-```
-
-### 封面图说明
-
-- 相对路径（推荐）：`./assets/cover.jpg`
-- 绝对路径：`/path/to/cover.jpg`
-- 网络图片：`https://example.com/cover.jpg`
-- 尺寸建议：1080×864（微信推荐比例）
-
-### 可用主题
-
-| 主题 | 风格 | 适合场景 |
-|------|------|----------|
-| lapis | 蓝色优雅 | 技术文章、教程 |
-| phycat | 绿色清新 | 博客、随笔 |
-| default | 经典简约 | 通用场景 |
-| orange | 橙色活力 | 产品介绍 |
-| purple | 紫色神秘 | 设计、创意 |
-
-### 可用代码高亮
-
-`solarized-light`, `monokai`, `github`, `atom-one-dark`, `dracula`, `nord`, `vs2015`, `highlightjs`, `prism`
-
-## AI 去痕配置
-
-AI 去痕是可选功能，需要配置 AI API：
+### 上传图片
 
 ```bash
-# 配置 AI Provider
-wechat-publisher config set ai.provider qwen  # 支持: openai, qwen, zhipu, doubao, minimax, moonshot, hunyuan, yi
-wechat-publisher config set ai.api_key <your_api_key>
+wechat-publisher upload-image image.jpg
 ```
 
-支持的 AI Provider：
-- `openai` - OpenAI GPT 系列
-- `qwen` - 通义千问（默认）
-- `zhipu` - 智谱 GLM
-- `doubao` - 豆包
-- `minimax` - MiniMax
-- `moonshot` - Moonshot
-- `hunyuan` - 腾讯混元
-- `yi` - 零一万物
+## AI 去痕
+
+AI 去痕是可选功能，让文章读起来更自然。支持的 Provider：
+
+| Provider | 说明 |
+|----------|------|
+| openai | OpenAI GPT 系列 |
+| qwen | 通义千问（默认） |
+| zhipu | 智谱 GLM |
+| doubao | 豆包 |
+| minimax | MiniMax |
+| moonshot | Moonshot |
+| hunyuan | 腾讯混元 |
+| yi | 零一万物 |
+
+去痕强度：
+- `light` - 轻度：保持原文大部分内容，只做轻微调整
+- `medium` - 中度：适度调整，保留核心内容
+- `heavy` - 重度：大幅调整，使文章焕然一新
 
 ## 故障排查
 
 ### 错误：未能找到文章封面
-- 原因：frontmatter 缺少 cover 字段
-- 解决：确保 frontmatter 包含 title 和 cover
+- 原因：未提供封面图片
+- 解决：使用 `--cover` 参数指定封面
 
 ### 错误：45166 (IP地址不在白名单中)
 - 原因：运行机器的 IP 未添加到微信白名单
@@ -172,26 +128,26 @@ wechat-publisher config set ai.api_key <your_api_key>
 - 原因：文章在草稿箱，需要审核发布
 - 解决：草稿箱 → 选中文章 → 发布
 
-### 图片上传失败？
-- 原因：网络图片无法访问或格式不支持
-- 解决：使用本地图片或检查网络连接
-
 ## 架构说明
 
 ```
 wechat-publisher/
-├── SKILL.md              # 本文档
-├── publish.sh            # 发布脚本（自动加载凭证）
-└── references/
-    └── themes.md         # 主题列表
+├── src/wechat_publisher/
+│   ├── cli.py         # CLI 入口
+│   ├── config.py      # 配置管理
+│   ├── humanizer/     # AI 去痕模块
+│   └── platforms/     # 平台适配器
+│       └── wechat.py  # 微信公众号 API
+└── pyproject.toml
 ```
 
-## 维护说明
+## 设计参考
 
-- **wenyan-cli**: Node.js CLI 工具，负责 Markdown → HTML 转换和图片上传
-- **wechat-publisher**: Python CLI 工具，负责 HTML → 微信草稿箱发布和 AI 去痕
-- **配置文件**: `~/.wechat-publisher/config.yaml`
-- **凭证读取**: 同时支持配置文件和环境变量（环境变量优先级更高）
+本项目参考了以下优秀项目的设计思路：
+- **wenyan-cli**: Markdown 转微信 HTML 的排版思路
+- **wechat-publisher**: 微信公众号 API 调用的封装方式
+
+但本项目是完全独立实现的，不依赖任何外部工具。
 
 ## 作者
 
