@@ -34,7 +34,14 @@ pip install -e .
 
 ## 配置
 
-### 方式 1: 环境变量
+### 第一步：获取微信公众号凭证
+
+1. 登录 [https://developers.weixin.qq.com/](https://developers.weixin.qq.com/) 公众号平台
+2. 获取 **AppID** 和 **AppSecret**
+
+### 第二步：配置凭证
+
+#### 方式 1: 环境变量
 
 ```bash
 export WECHAT_APP_ID=your_wechat_app_id
@@ -45,7 +52,7 @@ export AI_API_KEY=your_api_key
 export AI_PROVIDER=qwen  # openai, qwen, zhipu, doubao, minimax, moonshot, hunyuan, yi
 ```
 
-### 方式 2: 配置文件
+#### 方式 2: 配置文件
 
 ```bash
 # 初始化配置
@@ -58,7 +65,7 @@ wechat-publisher config set ai.api_key <API Key>
 wechat-publisher config set ai.provider qwen
 ```
 
-### 3. IP 白名单
+### 第三步：IP 白名单
 
 确保运行机器的 IP 已添加到微信公众号后台白名单：
 - 登录 https://mp.weixin.qq.com/

@@ -10,6 +10,13 @@ pip install wechat-publisher
 
 ## 配一下
 
+### 第一步：获取微信公众号凭证
+
+1. 登录 [https://developers.weixin.qq.com/](https://developers.weixin.qq.com/) 公众号平台
+2. 获取 **AppID** 和 **AppSecret**
+
+### 第二步：配置凭证
+
 ```bash
 # 初始化
 openclaw config init
