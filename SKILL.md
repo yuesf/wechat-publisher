@@ -1,4 +1,4 @@
-# wechat-publisher Skill
+# wechat-publish-pro Skill
 
 微信公众号文章发布工具，完全独立实现，不依赖任何外部 CLI 工具。
 
@@ -24,7 +24,7 @@
 
 ```bash
 # 从 GitHub 安装
-pip install git+https://github.com/yuesf/wechat-publisher.git
+pip install git+https://github.com/yuesf/wechat-publish-pro.git
 ```
 
 ## 配置
@@ -51,13 +51,13 @@ export AI_PROVIDER=qwen  # openai, qwen, zhipu, doubao, minimax, moonshot, hunyu
 
 ```bash
 # 初始化配置
-wechat-publisher config init
+wechat-publish-pro config init
 
 # 设置配置
-wechat-publisher config set wechat.app_id <AppID>
-wechat-publisher config set wechat.app_secret <AppSecret>
-wechat-publisher config set ai.api_key <API Key>
-wechat-publisher config set ai.provider qwen
+wechat-publish-pro config set wechat.app_id <AppID>
+wechat-publish-pro config set wechat.app_secret <AppSecret>
+wechat-publish-pro config set ai.api_key <API Key>
+wechat-publish-pro config set ai.provider qwen
 ```
 
 ### 第三步：设置 IP 白名单
@@ -82,49 +82,49 @@ wechat-publisher config set ai.provider qwen
 
 ```bash
 # 基本转换（默认绿色主题）
-wechat-publisher convert article.md
+wechat-publish-pro convert article.md
 
 # 指定蓝色主题
-wechat-publisher convert article.md --theme blue
+wechat-publish-pro convert article.md --theme blue
 
 # 指定输出文件
-wechat-publisher convert article.md -o output.html
+wechat-publish-pro convert article.md -o output.html
 ```
 
 #### 发布到微信
 
 ```bash
 # 发布 HTML 文件到草稿箱
-wechat-publisher publish article.html
+wechat-publish-pro publish article.html
 
 # 指定标题和封面
-wechat-publisher publish article.html --title "文章标题" --cover cover.jpg
+wechat-publish-pro publish article.html --title "文章标题" --cover cover.jpg
 
 # 不使用 AI 去痕
-wechat-publisher publish article.html --no-humanize
+wechat-publish-pro publish article.html --no-humanize
 
 # 调整 AI 去痕强度
-wechat-publisher publish article.html --intensity heavy
+wechat-publish-pro publish article.html --intensity heavy
 ```
 
 #### 一站式：Markdown → 转换 → 发布
 
 ```bash
 # 转换后直接发布
-wechat-publisher convert article.md --theme blue -o /tmp/article.html
-wechat-publisher publish /tmp/article.html --title "文章标题"
+wechat-publish-pro convert article.md --theme blue -o /tmp/article.html
+wechat-publish-pro publish /tmp/article.html --title "文章标题"
 ```
 
 #### 测试连接
 
 ```bash
-wechat-publisher test
+wechat-publish-pro test
 ```
 
 #### 上传图片
 
 ```bash
-wechat-publisher upload-image image.jpg
+wechat-publish-pro upload-image image.jpg
 ```
 
 ## Markdown 格式
@@ -186,8 +186,8 @@ AI 去痕是可选功能，让文章读起来更自然。支持的 Provider：
 ## 架构说明
 
 ```
-wechat-publisher/
-├── src/wechat_publisher/
+wechat-publish-pro/
+├── src/wechat_publish_pro/
 │   ├── cli.py         # CLI 入口
 │   ├── config.py      # 配置管理
 │   ├── converter/     # Markdown 转换模块

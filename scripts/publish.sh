@@ -1,6 +1,6 @@
 #!/bin/bash
 #===============================================================================
-# wechat-publisher - 微信公众号发布脚本
+# wechat-publish-pro - 微信公众号发布脚本
 # 
 # 完全独立实现，不依赖任何外部 CLI 工具
 # 
@@ -26,7 +26,7 @@ INTENSITY="${WECHAT_HUMANIZE_INTENSITY:-medium}"
 # 帮助信息
 show_help() {
     cat << EOF
-${BLUE}wechat-publisher - 微信公众号发布工具${NC}
+${BLUE}wechat-publish-pro - 微信公众号发布工具${NC}
 
 ${YELLOW}使用方法:${NC}
     $0 <file> [options]
@@ -84,8 +84,8 @@ check_dependencies() {
         exit 1
     fi
     
-    if ! python3 -c "import wechat_publisher" 2>/dev/null; then
-        log_error "wechat-publisher 未安装，请运行: pip install wechat-publisher"
+    if ! python3 -c "import wechat_publish_pro" 2>/dev/null; then
+        log_error "wechat-publish-pro 未安装，请运行: pip install wechat-publish-pro"
         exit 1
     fi
     
@@ -174,7 +174,7 @@ main() {
     load_env
     
     # 构建发布命令
-    local publish_cmd="wechat-publisher publish \"$file\""
+    local publish_cmd="wechat-publish-pro publish \"$file\""
     
     [[ -n "$title" ]] && publish_cmd="$publish_cmd --title \"$title\""
     [[ -n "$cover" ]] && publish_cmd="$publish_cmd --cover \"$cover\""

@@ -1,10 +1,10 @@
 ---
-title: 测试文章 - wechat-publisher
+title: 测试文章 - wechat-publish-pro
 cover: ./assets/cover.jpg
 author: yuesf
 ---
 
-# 欢迎使用 wechat-publisher
+# 欢迎使用 wechat-publish-pro
 
 这是一篇测试文章，用于验证微信公众号发布功能。
 
@@ -24,4 +24,4 @@ def hello():
 
 ## 总结
 
-wechat-publisher 让微信公众号发布变得更简单！
+wechat-publish-pro 让微信公众号发布变得更简单！

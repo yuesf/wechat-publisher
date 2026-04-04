@@ -20,7 +20,7 @@ from .humanizer import Humanizer
 from .platforms import WeChatPlatform, PublishRequest
 
 app = typer.Typer(
-    name="wechat-publisher",
+    name="wechat-publish-pro",
     help="微信公众号文章发布工具",
 )
 console = Console()
@@ -183,7 +183,7 @@ def config_add_account(
     """添加微信公众号账号
     
     示例:
-        wechat-publisher config add-account personal --name "个人公众号" --app-id xxx --app-secret xxx
+        wechat-publish-pro config add-account personal --name "个人公众号" --app-id xxx --app-secret xxx
     """
     settings.load()
     settings.add_account(key, name, app_id, app_secret)
@@ -230,8 +230,8 @@ def config_set(
     """设置配置项
 
     示例:
-        wechat-publisher config set ai.api_key your_api_key
-        wechat-publisher config set ai.provider qwen
+        wechat-publish-pro config set ai.api_key your_api_key
+        wechat-publish-pro config set ai.provider qwen
     """
     settings.load()
 

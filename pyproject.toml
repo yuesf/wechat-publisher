@@ -1,5 +1,5 @@
 [project]
-name = "wechat-publisher"
+name = "wechat-publish-pro"
 version = "0.1.0"
 description = "微信公众号文章发布工具，发布前自动 AI 去痕"
 readme = "README.md"
@@ -25,10 +25,10 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project.scripts]
-wechat-publisher = "wechat_publisher.cli:app"
+wechat-publish-pro = "wechat_publish_pro.cli:app"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/wechat_publisher"]
+packages = ["src/wechat_publish_pro"]
 
 [tool.hatch.build.targets.wheel.sources]
-"src/wechat_publisher" = "wechat_publisher"
+"src/wechat_publish_pro" = "wechat_publish_pro"

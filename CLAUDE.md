@@ -1,15 +1,15 @@
 # CLAUDE.md
 
-wechat-publisher 项目开发维护指南。
+wechat-publish-pro 项目开发维护指南。
 
 ## 项目结构
 
 ```
-wechat-publisher/
+wechat-publish-pro/
 ├── SKILL.md              # Skill 使用文档
 ├── scripts/
 │   └── publish.sh        # 发布脚本（Markdown → HTML → 微信）
-├── src/wechat_publisher/
+├── src/wechat_publish_pro/
 │   ├── __init__.py
 │   ├── cli.py            # CLI 入口 (typer)
 │   ├── config.py         # 配置管理
@@ -32,9 +32,9 @@ pip install .
 pip install -e .
 
 # 测试 CLI
-wechat-publisher --help
-wechat-publisher config show
-wechat-publisher test
+wechat-publish-pro --help
+wechat-publish-pro config show
+wechat-publish-pro test
 
 # 测试 wenyan-cli
 wenyan render -f example.md -t lapis
@@ -43,7 +43,7 @@ wenyan render -f example.md -t lapis
 ## 依赖
 
 - **wenyan-cli**: Node.js CLI，`npm install -g @wenyan-md/cli`
-- **wechat-publisher**: Python 包，本项目
+- **wechat-publish-pro**: Python 包，本项目
 
 ## 微信公众号 API
 

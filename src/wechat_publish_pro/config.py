@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     """应用配置"""
 
     # 配置文件路径
-    config_dir: Path = Path.home() / ".wechat-publisher"
+    config_dir: Path = Path.home() / ".wechat-publish-pro"
 
     # 平台配置（多账号）
     wechat: WeChatMultiConfig = WeChatMultiConfig()
