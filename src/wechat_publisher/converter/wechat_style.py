@@ -65,6 +65,15 @@ class WeChatStyleConverter:
         html = self._convert_lists(html)
 
         # 7. 处理图片
+        # 保护已转换的 img src 属性，避免后续 _convert_strong_em 破坏 URL
+        # 使用 \x00 不可见字符作为 placeholder 分隔符，避免被 _underline_ 斜体模式匹配
+        img_placeholders = {}
+        def protect_img(m):
+            placeholder = f'\x00IMG_PLACEHOLDER_{len(img_placeholders)}\x00'
+            img_placeholders[placeholder] = m.group(0)
+            return placeholder
+        html = re.sub(r'<img src="[^"]+"(?:[^>]*)>', protect_img, html)
+        self._img_placeholders = img_placeholders
         html = self._convert_images(html)
 
         # 8. 处理链接
@@ -75,6 +84,11 @@ class WeChatStyleConverter:
 
         # 10. 处理粗体和斜体
         html = self._convert_strong_em(html)
+        # 恢复被保护的 img 标签（使用 \x00 分隔符，与保护时一致）
+        if hasattr(self, '_img_placeholders'):
+            for placeholder, original in self._img_placeholders.items():
+                html = html.replace(placeholder, original)
+            del self._img_placeholders
 
         # 11. 处理段落
         html = self._convert_paragraphs(html)
@@ -565,8 +579,22 @@ class WeChatStyleConverter:
 
     def _convert_images(self, text: str) -> str:
         """转换图片"""
-        return re.sub(r'!\[([^\]]*)\]\(([^)]+)\)',
+        # 处理 Markdown 图片语法 ![alt](url)
+        text = re.sub(r'!\[([^\]]*)\]\(([^)]+)\)',
                       f'<img src="\\2" alt="\\1" style="{self.theme.img_style}">', text)
+        # 处理已有的原始 HTML <img> 标签，确保使用主题的图片样式
+        def apply_img_style(m):
+            tag = m.group(0)
+            if 'style=' in tag:
+                # 已有效率样式，只确保 width="100%" 存在
+                if 'width=' not in tag:
+                    tag = tag.replace('<img ', '<img width="100%" ')
+                return tag
+            else:
+                # 没有 style，加上主题样式
+                return f'<img width="100%" style="{self.theme.img_style}" src="{m.group(1)}">'
+        text = re.sub(r'<img src="([^"]+)"[^>]*>', apply_img_style, text)
+        return text
 
     def _convert_links(self, text: str) -> str:
         """转换链接"""
