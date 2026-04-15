@@ -129,17 +129,39 @@ wechat-publish-pro upload-image image.jpg
 
 ## Markdown 格式
 
-文件顶部可以包含 frontmatter：
+文件顶部可以包含 frontmatter（建议只用 cover，不用 title，避免重复）：
 
 ```markdown
----
+<!--
 title: 文章标题
+---
 cover: ./assets/cover.jpg
 ---
 
-# 正文开始（frontmatter 有 title 时会自动移除）
-
 你的内容...
+```
+
+**重要注意事项**：
+
+- **不要在正文使用 `#` 大标题**——标题由命令行 `-t` 参数提供，正文里的 `#` 标题会导致标题重复输出
+- **不要使用 `---` 作为章节分隔线**——wenyan-cli 会将其误解析为列表项 `• --`，用空行替代 `---`
+- **frontmatter 的 `title` 会被输出到正文**——如果同时在正文写了 `#` 标题，会导致两个标题重复；建议 frontmatter 的 title 用 `<!-- -->` 包裹，或完全不用 frontmatter 的 title，改由命令行 `-t` 提供标题
+
+**推荐格式**：
+
+```markdown
+<!--
+title: 文章标题（可选，用命令行 -t 更稳定）
+cover: ./assets/cover.jpg
+---
+
+第一段内容（直接开始，不要用 `#` 标题）
+
+## 章节标题（使用 ## ，不是 #）
+
+内容...
+
+（章节之间用空行分隔，不要用 ---）
 ```
 
 ## 可用主题
