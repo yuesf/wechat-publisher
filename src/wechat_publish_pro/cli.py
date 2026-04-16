@@ -16,7 +16,6 @@ import typer
 
 from .config import settings, WeChatAccount
 from .converter import WeChatStyleConverter
-from .humanizer import Humanizer
 from .platforms import WeChatPlatform, PublishRequest
 
 app = typer.Typer(
@@ -82,54 +81,6 @@ def create_wechat_platform(account: WeChatAccount) -> WeChatPlatform:
         app_id=account.app_id,
         app_secret=account.app_secret,
     )
-
-
-async def humanize_html_content(content: str, intensity: str = "medium") -> tuple[str, bool]:
-    """
-    对 HTML 内容进行去痕处理
-
-    Returns:
-        tuple[处理后的内容, 是否进行了去痕处理]
-    """
-    settings.load()
-    if not settings.is_ai_configured():
-        return content, False
-
-    # 简单处理：从 HTML 中提取纯文本进行处理
-    # 移除 HTML 标签获取纯文本
-    text_content = re.sub(r'<[^>]+>', '\n', content)
-    text_content = re.sub(r'\n+', '\n', text_content).strip()
-
-    if not text_content:
-        return content, False
-
-    console.print(f"[cyan]正在使用 AI 去痕处理...[/cyan]")
-
-    humanizer = Humanizer(
-        api_key=settings.ai.api_key,
-        provider=settings.ai.provider,
-        base_url=settings.ai.base_url,
-        model=settings.ai.model,
-    )
-
-    try:
-        result = await humanizer.humanize(text_content, intensity=intensity)
-
-        if result.changes:
-            console.print(f"[yellow]去痕变化:[/yellow]")
-            for change in result.changes[:3]:
-                console.print(f"  - {change}")
-
-        # 将去痕后的文本重新包装成简单 HTML
-        humanized_html = f"<p>来源: AI整理</p>\n" + result.humanized.replace("\n\n", "</p><p>").replace("\n", "<br>")
-        humanized_html = f"<div>{humanized_html}</div>"
-
-        return humanized_html, True
-    except Exception as e:
-        console.print(f"[yellow]AI 去痕失败: {e}，使用原文发布[/yellow]")
-        return content, False
-    finally:
-        await humanizer.close()
 
 
 # 配置命令组
@@ -319,6 +270,9 @@ def convert(
             h1_match = re.search(r'^#\s+(.+)$', markdown_content, re.MULTILINE)
             if h1_match:
                 article_title = h1_match.group(1).strip()
+        # 无论标题是否提取成功，都移除第一个 H1 避免重复
+        markdown_content = re.sub(r'^#\s+.+$', '', markdown_content, count=1, flags=re.MULTILINE)
+        markdown_content = markdown_content.lstrip('\n')
 
     console.print(f"[cyan]转换 Markdown → HTML[/cyan]")
     console.print(f"[cyan]输入文件: {file}[/cyan]")
@@ -354,12 +308,8 @@ def publish(
     cover: Optional[str] = typer.Option(None, "--cover", "-c", help="封面图片路径"),
     author: Optional[str] = typer.Option(None, "--author", "-a", help="作者"),
     account: Optional[str] = typer.Option(None, "--account", help="指定账号标识（不指定则交互选择）"),
-    humanize: bool = typer.Option(True, "--humanize/--no-humanize", help="发布前自动 AI 去痕（默认启用）"),
-    intensity: str = typer.Option("medium", "--intensity", "-i", help="去痕强度 (light/medium/heavy)"),
 ) -> None:
     """发布 HTML 文件到微信公众号草稿箱
-
-    发布前会自动使用 AI 去痕处理，让文章读起来更自然。
     """
     if not file.exists():
         console.print(f"[red]文件不存在: {file}[/red]")
@@ -395,14 +345,6 @@ def publish(
     else:
         # 交互选择
         acc = select_account()
-
-    # AI 去痕处理
-    if humanize:
-        html_content, was_humanized = asyncio.run(humanize_html_content(html_content, intensity))
-        if was_humanized:
-            console.print(f"[green]AI 去痕完成[/green]")
-        else:
-            console.print(f"[yellow]跳过 AI 去痕（未配置 AI）[/yellow]")
 
     # 发布到平台
     try:

@@ -1,6 +1,6 @@
 # wechat-publish-pro
 
-把文章发到微信公众号草稿箱，发布前自动 AI 去痕，让内容读起来更像真人写的。
+把 Markdown 文章转换为微信公众号格式并发布到草稿箱。
 
 ## 装上
 
@@ -24,10 +24,6 @@ wechat-publish-pro config init
 # 微信公众号的凭证
 wechat-publish-pro config set wechat.app_id <你的AppID>
 wechat-publish-pro config set wechat.app_secret <你的AppSecret>
-
-# AI 去痕用的 API（可选，但建议配）
-wechat-publish-pro config set ai.api_key <你的API Key>
-wechat-publish-pro config set ai.provider qwen  # 或者 openai、zhipu 等
 ```
 
 ### 第三步：设置 IP 白名单
@@ -48,18 +44,11 @@ wechat-publish-pro config set ai.provider qwen  # 或者 openai、zhipu 等
 ### 命令行方式
 
 ```bash
-# 把 HTML 文章发到公众号草稿箱，自动 AI 去痕
+# 把 HTML 文章发到公众号草稿箱
 wechat-publish-pro publish article.html
-
-# 不用 AI 去痕
-wechat-publish-pro publish article.html --no-humanize
 
 # 指定标题和封面
 wechat-publish-pro publish article.html --title "文章标题" --cover cover.jpg
-
-# 调过去痕强度
-wechat-publish-pro publish article.html --intensity light   # 轻度
-wechat-publish-pro publish article.html --intensity heavy  # 重度
 
 # 看看配置对不对
 wechat-publish-pro config show
@@ -89,22 +78,7 @@ wechat-publish-pro publish /tmp/article.html
 ```bash
 export WECHAT_APP_ID=xxx
 export WECHAT_APP_SECRET=xxx
-export AI_API_KEY=xxx
-export AI_PROVIDER=qwen
 ```
-
-## 支持的 AI Provider
-
-| Provider | 说明 |
-|----------|------|
-| openai | OpenAI GPT 系列 |
-| qwen | 通义千问（默认） |
-| zhipu | 智谱 GLM |
-| doubao | 豆包 |
-| minimax | MiniMax |
-| moonshot | Moonshot |
-| hunyuan | 腾讯混元 |
-| yi | 零一万物 |
 
 ## 可用主题
 

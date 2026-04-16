@@ -205,7 +205,7 @@ class WeChatStyleConverter:
             "gap: 8px;"
         )
 
-        return f'''<figure style="margin: 24px 0; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.15); background: #282c34;">
+        return f'''<figure style="margin: 0; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.15); background: #282c34;">
 <section style="{header_style}">
 <span style="width: 12px; height: 12px; border-radius: 50%; background: #ff5f56; box-shadow: inset 0 -1px 1px rgba(0,0,0,0.1);"></span>
 <span style="width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e; box-shadow: inset 0 -1px 1px rgba(0,0,0,0.1);"></span>
@@ -428,8 +428,9 @@ class WeChatStyleConverter:
                 # 处理内联格式
                 content = self._process_inline(content)
                 # 使用 section 模拟有序列表项
+                # 注意：不重复加 padding-left（容器的 padding 已处理缩进），内容紧贴容器左边
                 html_parts.append(
-                    f'<section style="display: flex; align-items: flex-start; margin: 6px 0; padding-left: {padding_left}px;">'
+                    f'<section style="display: flex; align-items: flex-start; margin: 6px 0; padding-left: 0;">'
                     f'<span style="min-width: 20px; color: #3f3f3f; font-size: 15px;">{number}.</span>'
                     f'<span style="flex: 1; color: #3f3f3f; font-size: 15px; line-height: 1.8;">{content}</span>'
                     f'</section>'
@@ -445,8 +446,9 @@ class WeChatStyleConverter:
                 # 处理内联格式
                 content = self._process_inline(content)
                 # 使用 section 模拟无序列表项，使用 • 作为项目符号
+                # 注意：不重复加 padding-left（容器的 padding 已处理缩进），内容紧贴容器左边
                 html_parts.append(
-                    f'<section style="display: flex; align-items: flex-start; margin: 6px 0; padding-left: {padding_left}px;">'
+                    f'<section style="display: flex; align-items: flex-start; margin: 6px 0; padding-left: 0;">'
                     f'<span style="min-width: 20px; color: #3f3f3f; font-size: 15px;">•</span>'
                     f'<span style="flex: 1; color: #3f3f3f; font-size: 15px; line-height: 1.8;">{content}</span>'
                     f'</section>'

@@ -8,7 +8,6 @@
 - **Markdown 转换**: 内置 Markdown → HTML 转换，参考 wenyan-cli 排版风格
 - **多主题支持**: 多种精美主题（green、blue、purple、orange、default、simple）
 - **代码高亮**: Mac 风格代码块，语法高亮
-- **AI 去痕**: 发布前自动 AI 去痕处理，让内容读起来更像真人写的
 - **封面生成**: 自动处理封面图，支持本地/网络图片
 - **直接发布**: 一键发布到微信公众号草稿箱
 
@@ -41,10 +40,6 @@ pip install git+https://github.com/yuesf/wechat-publish-pro.git
 ```bash
 export WECHAT_APP_ID=your_wechat_app_id
 export WECHAT_APP_SECRET=your_wechat_app_secret
-
-# AI 去痕（可选）
-export AI_API_KEY=your_api_key
-export AI_PROVIDER=qwen  # openai, qwen, zhipu, doubao, minimax, moonshot, hunyuan, yi
 ```
 
 #### 配置文件
@@ -56,8 +51,6 @@ wechat-publish-pro config init
 # 设置配置
 wechat-publish-pro config set wechat.app_id <AppID>
 wechat-publish-pro config set wechat.app_secret <AppSecret>
-wechat-publish-pro config set ai.api_key <API Key>
-wechat-publish-pro config set ai.provider qwen
 ```
 
 ### 第三步：设置 IP 白名单
@@ -74,7 +67,6 @@ wechat-publish-pro config set ai.provider qwen
 - "把这篇文章发到公众号"
 - "用蓝色主题发布"
 - "帮我发布到微信，测试一下"
-- "使用 AI 去痕发布"
 
 ### 命令行方式
 
@@ -94,18 +86,16 @@ wechat-publish-pro convert article.md -o output.html
 #### 发布到微信
 
 ```bash
-# 发布 HTML 文件到草稿箱
-wechat-publish-pro publish article.html
+# 发布 HTML 文件到草稿箱（需要指定账号，否则会卡在交互提示）
+wechat-publish-pro publish article.html --account <账号标识>
 
 # 指定标题和封面
-wechat-publish-pro publish article.html --title "文章标题" --cover cover.jpg
-
-# 不使用 AI 去痕
-wechat-publish-pro publish article.html --no-humanize
-
-# 调整 AI 去痕强度
-wechat-publish-pro publish article.html --intensity heavy
+wechat-publish-pro publish article.html --title "文章标题" --cover cover.jpg --account <账号标识>
 ```
+
+**常见问题：**
+- **发布命令卡住不动**：确保使用 `--account` 参数指定账号，避免交互式选择
+- **封面上传失败**：确认封面图片路径存在，不存在时省略 `--cover` 参数
 
 #### 一站式：Markdown → 转换 → 发布
 
@@ -175,26 +165,6 @@ cover: ./assets/cover.jpg
 | default | 简洁清爽 |
 | simple | 极简风格 |
 
-## AI 去痕
-
-AI 去痕是可选功能，让文章读起来更自然。支持的 Provider：
-
-| Provider | 说明 |
-|----------|------|
-| openai | OpenAI GPT 系列 |
-| qwen | 通义千问（默认） |
-| zhipu | 智谱 GLM |
-| doubao | 豆包 |
-| minimax | MiniMax |
-| moonshot | Moonshot |
-| hunyuan | 腾讯混元 |
-| yi | 零一万物 |
-
-去痕强度：
-- `light` - 轻度：保持原文大部分内容，只做轻微调整
-- `medium` - 中度：适度调整，保留核心内容
-- `heavy` - 重度：大幅调整，使文章焕然一新
-
 ## 故障排查
 
 ### 错误：45166 (IP地址不在白名单中)
@@ -216,7 +186,6 @@ wechat-publish-pro/
 │   │   ├── wechat_style.py   # 微信公众号样式转换器
 │   │   ├── themes.py          # 主题配置
 │   │   └── theme_types.py     # 主题数据类型
-│   ├── humanizer/     # AI 去痕模块
 │   └── platforms/     # 平台适配器
 │       └── wechat.py # 微信公众号 API
 └── pyproject.toml
