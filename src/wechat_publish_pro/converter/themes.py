@@ -206,6 +206,46 @@ PURPLE_THEME = ThemeStyles(
     container_style='padding: 20px; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", Arial, sans-serif;',
 )
 
+# 深蓝主题 - 深邃专业
+DARK_BLUE_THEME = ThemeStyles(
+    name="darkblue",
+    display_name="深蓝主题",
+    description="深邃专业的深蓝色主题",
+    colors=ThemeColors(
+        primary="#1a237e",
+        secondary="#283593",
+        accent="#3949ab",
+        code_background="#0d1b2a",
+        code_text="#e3f2fd",
+        quote_border="#1a237e",
+        link="#1a237e",
+        table_header_bg="#1a237e",
+    ),
+    h1_style='font-size: 24px; font-weight: bold; color: #1a237e; margin: 20px 0 10px; text-align: center; border-bottom: 3px solid #1a237e; padding-bottom: 10px;',
+    h2_style='font-size: 20px; font-weight: bold; color: #1a237e; margin: 18px 0 8px; padding: 10px 16px; padding-left: 14px; border-left: 5px solid #1a237e; background: linear-gradient(90deg, #e8eaf6 0%, transparent 100%); border-radius: 0 4px 4px 0;',
+    h3_style='font-size: 18px; font-weight: bold; color: #1a237e; margin: 16px 0 6px; padding-left: 12px; border-left: 4px solid #3949ab; background: linear-gradient(90deg, #e8eaf6 0%, transparent 100%);',
+    h4_style='font-size: 16px; font-weight: bold; color: #3949ab; margin: 14px 0 4px;',
+    p_style='font-size: 15px; line-height: 1.8; color: #333; margin: 10px 0; letter-spacing: 0.5px;',
+    blockquote_style='background: linear-gradient(135deg, #e8eaf6 0%, #fff 100%); border-left: 4px solid #1a237e; padding: 12px 16px; margin: 16px 0; color: #555; font-size: 14px; border-radius: 0 8px 8px 0;',
+    code_inline_style='background-color: #e8eaf6; color: #1a237e; padding: 3px 8px; border-radius: 4px; font-family: \'SF Mono\', Consolas, monospace; font-size: 14px;',
+    code_block_style='background-color: #0d1b2a; color: #e3f2fd; border-radius: 8px; padding: 16px; margin: 16px 0; overflow-x: auto; font-family: \'SF Mono\', Consolas, monospace; font-size: 14px; line-height: 1.7; box-shadow: 0 4px 12px rgba(13, 27, 42, 0.4);',
+    code_header_style='background-color: #0a1520; color: #90caf9; padding: 8px 16px; font-size: 12px; border-radius: 8px 8px 0 0; border-bottom: 1px solid #1a3a5e;',
+    ul_style='padding-left: 20px; margin: 10px 0; list-style-type: disc;',
+    ol_style='padding-left: 0px; margin: 10px 0; list-style-position: inside;',
+    li_style='font-size: 15px; line-height: 1.8; color: #333; margin: 6px 0;',
+    table_style='width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(26, 35, 126, 0.2);',
+    th_style='background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%); color: #fff; font-weight: bold; padding: 12px 15px; text-align: left; border: none;',
+    td_style='padding: 12px 15px; border: none; border-bottom: 1px solid #e8eaf6;',
+    tr_odd_style='background-color: #fff;',
+    tr_even_style='background-color: #f5f6fa;',
+    img_style='max-width: 100%; height: auto; display: block; margin: 15px auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(26, 35, 126, 0.3);',
+    a_style='color: #1a237e; text-decoration: none; border-bottom: 1px solid #3949ab;',
+    hr_style='border: none; height: 2px; background: linear-gradient(90deg, transparent, #1a237e, #3949ab, #1a237e, transparent); margin: 24px 0;',
+    strong_style='font-weight: bold; color: #1a237e;',
+    em_style='font-style: italic; color: #3949ab;',
+    container_style='padding: 20px; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", Arial, sans-serif;',
+)
+
 # 简约主题 - 极简风格
 SIMPLE_THEME = ThemeStyles(
     name="simple",
@@ -251,6 +291,7 @@ THEMES: dict[str, ThemeStyles] = {
     "blue": BLUE_THEME,
     "green": GREEN_THEME,
     "purple": PURPLE_THEME,
+    "darkblue": DARK_BLUE_THEME,
     "simple": SIMPLE_THEME,
 }
 
