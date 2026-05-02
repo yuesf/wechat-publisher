@@ -1,7 +1,7 @@
 [project]
 name = "wechat-publish-pro"
 version = "0.1.0"
-description = "微信公众号文章发布工具，发布前自动 AI 去痕"
+description = "微信公众号文章发布工具，支持 Markdown 转换、多主题美化、一键发布到草稿箱"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

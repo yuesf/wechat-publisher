@@ -118,9 +118,6 @@ def config_show() -> None:
     else:
         table.add_row("微信公众号账号", "[red]未配置[/red]")
     
-    table.add_row("AI Provider", settings.ai.provider or "[red]未配置[/red]")
-    table.add_row("AI Model", settings.ai.model or "[red]未配置[/red]")
-
     console.print(table)
 
 
@@ -181,8 +178,7 @@ def config_set(
     """设置配置项
 
     示例:
-        wechat-publish-pro config set ai.api_key your_api_key
-        wechat-publish-pro config set ai.provider qwen
+        wechat-publish-pro config set account.name 默认账号
     """
     settings.load()
 
@@ -193,19 +189,7 @@ def config_set(
 
     section, subkey = parts
 
-    if section == "ai":
-        if subkey == "provider":
-            settings.ai.provider = value
-        elif subkey == "api_key":
-            settings.ai.api_key = value
-        elif subkey == "base_url":
-            settings.ai.base_url = value
-        elif subkey == "model":
-            settings.ai.model = value
-        else:
-            console.print(f"[red]未知配置项: {key}[/red]")
-            raise typer.Exit(1)
-    elif section == "wechat":
+    if section == "wechat":
         console.print("[yellow]提示: 微信账号请使用 add-account 命令添加[/yellow]")
         raise typer.Exit(1)
     else:

@@ -45,14 +45,6 @@ class WeChatMultiConfig(BaseModel):
     default_account: str = ""
 
 
-class AIConfig(BaseModel):
-    """AI 配置"""
-    provider: str = "openai"
-    api_key: str = ""
-    base_url: str = ""
-    model: str = ""
-
-
 class Settings(BaseSettings):
     """应用配置"""
 
@@ -61,9 +53,6 @@ class Settings(BaseSettings):
 
     # 平台配置（多账号）
     wechat: WeChatMultiConfig = WeChatMultiConfig()
-
-    # AI 配置
-    ai: AIConfig = AIConfig()
 
     class Config:
         env_prefix = "WECHAT_PUBLISHER_"
@@ -91,8 +80,6 @@ class Settings(BaseSettings):
                     }
                 if "default_account" in data:
                     self.wechat.default_account = data["default_account"]
-                if "ai" in data:
-                    self.ai = AIConfig(**data["ai"])
 
         # 环境变量覆盖（单个账号模式，用于兼容旧配置）
         wechat_app_id = openclaw_env.get("WECHAT_APP_ID") or os.environ.get("WECHAT_APP_ID")
@@ -108,22 +95,6 @@ class Settings(BaseSettings):
                 )
                 self.wechat.default_account = "default"
 
-        # AI 配置
-        ai_provider = openclaw_env.get("AI_PROVIDER") or os.environ.get("AI_PROVIDER")
-        if ai_provider is not None:
-            self.ai.provider = ai_provider
-
-        ai_api_key = openclaw_env.get("AI_API_KEY") or os.environ.get("AI_API_KEY")
-        if ai_api_key is not None:
-            self.ai.api_key = ai_api_key
-
-        ai_base_url = openclaw_env.get("AI_BASE_URL") or os.environ.get("AI_BASE_URL")
-        if ai_base_url is not None:
-            self.ai.base_url = ai_base_url
-
-        ai_model = openclaw_env.get("AI_MODEL") or os.environ.get("AI_MODEL")
-        if ai_model is not None:
-            self.ai.model = ai_model
 
     def save(self) -> None:
         """保存配置到文件"""
@@ -133,7 +104,6 @@ class Settings(BaseSettings):
         data = {
             "accounts": {k: v.model_dump() for k, v in self.wechat.accounts.items()},
             "default_account": self.wechat.default_account,
-            "ai": self.ai.model_dump(),
         }
 
         with open(config_file, "w", encoding="utf-8") as f:
@@ -161,9 +131,6 @@ class Settings(BaseSettings):
             acc.app_id and acc.app_secret 
             for acc in self.wechat.accounts.values()
         )
-
-    def is_ai_configured(self) -> bool:
-        return bool(self.ai.api_key)
 
     def add_account(self, key: str, name: str, app_id: str, app_secret: str) -> None:
         """添加账号"""

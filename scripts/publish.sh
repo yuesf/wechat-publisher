@@ -19,10 +19,6 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# 默认值
-HUMANIZE="${WECHAT_HUMANIZE:-true}"
-INTENSITY="${WECHAT_HUMANIZE_INTENSITY:-medium}"
-
 # 帮助信息
 show_help() {
     cat << EOF
@@ -37,23 +33,14 @@ ${YELLOW}参数:${NC}
 ${YELLOW}选项:${NC}
     --title <title>     指定文章标题
     --cover <path>      指定封面图片
-    --humanize          启用 AI 去痕（默认）
-    --no-humanize       禁用 AI 去痕
-    --intensity <level> 去痕强度 (light/medium/heavy)
 
 ${YELLOW}环境变量:${NC}
     WECHAT_APP_ID              微信 AppID
     WECHAT_APP_SECRET          微信 AppSecret
-    WECHAT_HUMANIZE            是否启用 AI 去痕 (true/false)
-    WECHAT_HUMANIZE_INTENSITY  去痕强度 (light/medium/heavy)
-    AI_API_KEY                 AI API Key
-    AI_PROVIDER                AI Provider
 
 ${YELLOW}示例:${NC}
     $0 article.html
     $0 article.html --title "我的文章"
-    $0 article.html --no-humanize
-    $0 article.html --intensity heavy
 
 EOF
 }
@@ -124,18 +111,6 @@ main() {
                 cover="$2"
                 shift 2
                 ;;
-            --humanize)
-                HUMANIZE="true"
-                shift
-                ;;
-            --no-humanize)
-                HUMANIZE="false"
-                shift
-                ;;
-            --intensity)
-                INTENSITY="$2"
-                shift 2
-                ;;
             -*)
                 log_error "未知选项: $1"
                 show_help
@@ -178,14 +153,6 @@ main() {
     
     [[ -n "$title" ]] && publish_cmd="$publish_cmd --title \"$title\""
     [[ -n "$cover" ]] && publish_cmd="$publish_cmd --cover \"$cover\""
-    
-    if [[ "$HUMANIZE" != "true" ]]; then
-        publish_cmd="$publish_cmd --no-humanize"
-        log_info "AI 去痕: 禁用"
-    else
-        publish_cmd="$publish_cmd --intensity $INTENSITY"
-        log_info "AI 去痕: 启用 (强度: $INTENSITY)"
-    fi
     
     log_info "执行: $publish_cmd"
     

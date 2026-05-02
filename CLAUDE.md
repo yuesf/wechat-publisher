@@ -13,8 +13,6 @@ wechat-publish-pro/
 │   ├── __init__.py
 │   ├── cli.py            # CLI 入口 (typer)
 │   ├── config.py         # 配置管理
-│   ├── humanizer/        # AI 去痕模块
-│   │   └── __init__.py
 │   └── platforms/        # 平台适配器
 │       ├── base.py       # 抽象基类
 │       ├── __init__.py

@@ -13,7 +13,7 @@ author: yuesf
 - Markdown 转 HTML
 - 多主题支持
 - 图片自动上传
-- AI 去痕处理
+- 一键发布到草稿箱
 
 ## 代码示例
 
